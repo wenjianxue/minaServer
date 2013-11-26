@@ -1,0 +1,64 @@
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
+    xsi:schemaLocation="
+        http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-2.5.xsd
+        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+<!-- ***********spring 属性配置********************** -->
+<bean class="org.springframework.beans.factory.config.CustomEditorConfigurer"> 
+        <property name="customEditors"> 
+            <map> 
+              <entry key="java.net.SocketAddress"> 
+                <bean class="org.apache.mina.integration.beans.InetSocketAddressEditor"/> 
+              </entry> 
+            </map> 
+        </property> 
+    </bean>
+
+<!-- ***********mina拦截器配置********************** -->
+<!-- mina日志拦截器配置 -->
+ <bean id="loggingFilter" class="org.apache.mina.filter.logging.LoggingFilter" /> 
+ 
+<bean id="minaServerCodecFilter" class="org.apache.mina.filter.codec.ProtocolCodecFilter">  
+    <constructor-arg>  
+      <bean class="org.apache.mina.filter.codec.textline.TextLineCodecFactory" >
+      <constructor-arg  index="0"  type="java.nio.charset.Charset"> 
+		<value>UTF-8</value>
+	  </constructor-arg> 
+      </bean> 
+    </constructor-arg>  
+  </bean>
+  
+  <bean id="threadPoolFilter" class="org.apache.mina.filter.executor.ExecutorFilter">  
+  </bean>
+
+
+<!-- ***********mina filter chain配置********************** -->
+  <bean id="filterChainBuilder" class="org.apache.mina.core.filterchain.DefaultIoFilterChainBuilder">  
+    <property name="filters">  
+      <map>  
+        <entry key="loggingFilter" value-ref="loggingFilter"/>  
+        <entry key="codecFilter" value-ref="minaServerCodecFilter"/> 
+        <entry key="threadPool" value-ref="threadPoolFilter"/>
+         
+      </map>  
+    </property>  
+  </bean>  
+
+
+<!-- ***********mina Handle********************** -->
+<bean id="MsPrintHandle" class="xuewenjian.minaserver.handle.MsgPrintHandle" />  
+
+
+<!-- ***********mina Acceptor********************** -->
+<bean id="ioAcceptor" class="org.apache.mina.transport.socket.nio.NioSocketAcceptor"
+        init-method="bind" destroy-method="unbind"> 
+        <property name="defaultLocalAddress" value="127.0.0.1:9876" /> 
+        <property name="handler" ref="MsPrintHandle" />
+        <property name="filterChainBuilder" ref="filterChainBuilder" /> 
+</bean>
+
+
+
+
+ </beans>
