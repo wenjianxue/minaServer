@@ -11,6 +11,12 @@ public class MsgPrintHandle extends IoHandlerAdapter {
 
 	private static final Logger LOG = LoggerFactory.getLogger(MsgPrintHandle.class);
 	
+	public MsgPrintHandle()
+	{
+		
+	}
+	
+	
 	public void exceptionCaught(IoSession session, Throwable cause) throws Exception
     {
         LOG.warn(cause.getMessage(), cause);
@@ -22,5 +28,10 @@ public class MsgPrintHandle extends IoHandlerAdapter {
        
         LOG.debug("Get Msg:" + expression);
     }
+	
+	public void sessionCreated(IoSession session) throws Exception {
+		LOG.debug("Session created...");
+	    
+	}
 	
 }
